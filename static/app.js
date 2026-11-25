@@ -210,6 +210,7 @@ function renderDecision() {
       <dt>情绪</dt><dd>${escapeHtml(d.emotion || "—")}</dd>
       <dt>风险</dt><dd>${escapeHtml(riskText)}</dd>
       <dt>优先级</dt><dd>${escapeHtml(d.priority || "—")}</dd>
+      <dt>应答方式</dt><dd>${d.llm && d.llm.used ? "大模型改写（" + escapeHtml(d.llm.model || "deepseek") + "）" : "规则拼接"}</dd>
     </dl>
     ${d.conflict ? '<p class="badge bad">知识冲突：前两条答案不一致</p>' : ""}
     ${d.handoff_reason ? `<p class="muted small">转人工原因：${escapeHtml(d.handoff_reason)}</p>` : ""}
