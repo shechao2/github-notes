@@ -7,6 +7,3 @@ data/*.db-journal
 .env
 *.log
 .DS_Store
-
-# 含个人联系方式，不进公开仓库
-docs/项目说明书.*
