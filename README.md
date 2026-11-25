@@ -4,6 +4,14 @@
 
 > 品牌「星驰汽车」与车型 X3 / S7 / L9、客户姓名均为虚构，仅用于演示；知识库 69 条 FAQ 为手工整理，内容结构参照真实 4S 店话术，不对应任何真实厂商。
 
+## 界面预览
+
+| 工作台（AI 决策面板 + 审核动作） | 工单（SLA 倒计时 + 处理闭环） |
+|---|---|
+| ![](docs/screenshots/workbench.png) | ![](docs/screenshots/tickets.png) |
+| **运营看板** | **知识库治理** |
+| ![](docs/screenshots/dashboard.png) | ![](docs/screenshots/kb.png) |
+
 ## 一条命令跑起来
 
 ```bash
