@@ -11,7 +11,7 @@ from __future__ import annotations
 import sqlite3
 from typing import Any
 
-from . import config, kb, nlu
+from . import config, kb, llm, nlu
 
 SOURCE_TEMPLATE = "\n\n依据：{source}（负责人 {owner}，更新于 {updated_at}）"
 
@@ -48,8 +48,7 @@ def decide(conn: sqlite3.Connection, text: str) -> dict[str, Any]:
     top = hits[0]["confidence"] if hits else 0.0
     conflict = kb.conflicts(hits)
 
-    if config.LLM_ENABLED:  # pragma: no cover - M2，占位保持接口一致
-        pass
+    llm_meta: dict[str, Any] = {"used": False}
 
     best = hits[0] if hits else None
     model_specific = bool(best) and config.ALL_MODELS not in (best["models"] or [])
@@ -87,9 +86,31 @@ def decide(conn: sqlite3.Connection, text: str) -> dict[str, Any]:
 
     if status == "answered":
         best = hits[0]
-        answer = best["answer"] + SOURCE_TEMPLATE.format(
+        citation = SOURCE_TEMPLATE.format(
             source=best["source"], owner=best["owner"], updated_at=best["updated_at"]
         )
+        answer = best["answer"] + citation
+        if llm.available():
+            try:
+                out = llm.compose(text, analysis, evidence)
+                if out["status"] == "handoff":
+                    status = "handoff"
+                    answer = "这个问题需要人工同事确认，我先帮你建工单，稍后由专人联系你。"
+                    llm_meta = {"used": True, "model": out.get("model"), "escalated": "handoff"}
+                elif out["status"] == "ok" and llm.grounded(out["text"], evidence):
+                    answer = out["text"] + citation
+                    llm_meta = {
+                        "used": True,
+                        "model": out.get("model"),
+                        "usage": out.get("usage", {}),
+                    }
+                else:
+                    llm_meta = {
+                        "used": False,
+                        "reason": out.get("status") or "答案数字未在证据中出现，已回退规则答案",
+                    }
+            except Exception as exc:  # 网络/额度/超时一律回退，不影响主流程
+                llm_meta = {"used": False, "reason": f"{type(exc).__name__}: {exc}"}
     elif status == "clarify":
         questions = nlu.clarify_questions(missing_required) or [
             "能再说得具体一点吗？比如车型、年份和具体现象。"
@@ -117,6 +138,7 @@ def decide(conn: sqlite3.Connection, text: str) -> dict[str, Any]:
         "clarify": nlu.clarify_questions(missing_required) if status == "clarify" else [],
         "handoff_reason": _handoff_reason(analysis, status, conflict),
         "priority": _priority(analysis, status),
+        "llm": llm_meta,
     }
     if status == "answered":
         kb.bump_hits(conn, [evidence[0]["faq_id"]])
