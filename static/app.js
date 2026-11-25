@@ -422,6 +422,24 @@ function renderDashboard() {
     ? d.repeat_handoff.map((x) => `<div><span>${escapeHtml(x.intent)}</span><b>${x.count} 单</b></div>`).join("")
     : '<p class="muted small">暂无重复转人工</p>';
 
+  const fault = d.fault_phenomena || [];
+  const maxFault = Math.max(1, ...fault.map((x) => Math.max(x.hits, x.faq_count)));
+  $("#faultPhenomena").innerHTML = fault.length
+    ? fault.map((x) => `
+      <div class="bar-row"><span>${escapeHtml(x.phenomenon)}</span>
+        <div class="bar"><i style="width:${(Math.max(x.hits, x.faq_count) / maxFault) * 100}%"></i></div>
+        <span>${x.hits}</span></div>`).join("")
+    : '<p class="muted small">暂无数据</p>';
+
+  const cases = d.bad_cases || [];
+  $("#badCaseCount").textContent = `${d.bad_case_count || 0} 条`;
+  $("#badCases").innerHTML = cases.length
+    ? cases.map((c) => `
+      <div><span>${escapeHtml((c.question || "").slice(0, 26))}
+        <br><small class="muted">${escapeHtml((c.reasons || []).join(" / "))}${c.ticket_no ? " · " + escapeHtml(c.ticket_no) : ""}</small></span>
+        <b>${escapeHtml(c.owner || "未建单")}</b></div>`).join("")
+    : '<p class="muted small">暂无 Bad Case</p>';
+
   $("#faqStats").innerHTML = `
     <div><span>FAQ 总数（生效）</span><b>${d.faq.total}</b></div>
     <div><span>新增 FAQ</span><b>${d.faq.new}</b></div>
@@ -456,7 +474,7 @@ function renderFaq() {
   const rows = state.faq.map((e) => `
     <tr>
       <td>${escapeHtml(e.id)}</td>
-      <td>${escapeHtml(e.category)}</td>
+      <td>${escapeHtml(e.category)}${e.phenomenon ? `<br><small class="muted">${escapeHtml(e.phenomenon)}</small>` : ""}</td>
       <td><b>${escapeHtml(e.question)}</b><br><small class="muted">${escapeHtml((e.variants || []).slice(0, 3).join(" / "))}</small></td>
       <td>${escapeHtml(e.owner)}</td>
       <td>${escapeHtml(e.updated_at)}</td>

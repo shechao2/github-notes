@@ -22,7 +22,8 @@
       "车型对比",
       "选车"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-002",
@@ -46,7 +47,8 @@
       "续航",
       "参数"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-003",
@@ -70,7 +72,8 @@
       "续航",
       "参数"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-004",
@@ -96,7 +99,8 @@
       "增程",
       "续航"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-005",
@@ -122,7 +126,8 @@
       "充电",
       "快充"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-006",
@@ -148,7 +153,8 @@
       "充电桩",
       "家充"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-007",
@@ -172,7 +178,8 @@
       "充电桩",
       "安装"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-008",
@@ -196,7 +203,8 @@
       "权益",
       "充电"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-009",
@@ -222,7 +230,8 @@
       "价格",
       "指导价"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-010",
@@ -246,7 +255,8 @@
       "金融",
       "首付"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-011",
@@ -270,7 +280,8 @@
       "金融",
       "利率"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-012",
@@ -294,7 +305,8 @@
       "置换",
       "补贴"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-013",
@@ -323,7 +335,8 @@
       "试驾",
       "预约"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-014",
@@ -349,7 +362,8 @@
       "试驾",
       "上门"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-015",
@@ -373,7 +387,8 @@
       "交付",
       "提车"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-016",
@@ -398,7 +413,8 @@
       "退款",
       "风险口径"
     ],
-    "priority": "P0"
+    "priority": "P0",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-017",
@@ -422,7 +438,8 @@
       "购置税",
       "政策"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-018",
@@ -446,7 +463,8 @@
       "上牌",
       "绿牌"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-019",
@@ -470,7 +488,8 @@
       "保险",
       "费用"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-020",
@@ -494,7 +513,8 @@
       "质保",
       "三电"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-021",
@@ -521,7 +541,8 @@
       "冬季",
       "续航"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-022",
@@ -547,7 +568,8 @@
       "颜色",
       "选装"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-023",
@@ -571,7 +593,8 @@
       "现车",
       "库存"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-024",
@@ -596,7 +619,8 @@
       "智驾",
       "配置"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-025",
@@ -620,7 +644,8 @@
       "OTA",
       "车机"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-026",
@@ -644,7 +669,8 @@
       "保值率",
       "二手车"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-027",
@@ -668,7 +694,8 @@
       "企业采购",
       "大客户"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-028",
@@ -692,7 +719,8 @@
       "金融",
       "征信"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-029",
@@ -717,7 +745,8 @@
       "首保",
       "周期"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "保养"
   },
   {
     "id": "FAQ-030",
@@ -743,7 +772,8 @@
       "保养",
       "周期"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "保养"
   },
   {
     "id": "FAQ-031",
@@ -767,7 +797,8 @@
       "保养",
       "项目"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "保养"
   },
   {
     "id": "FAQ-032",
@@ -794,7 +825,8 @@
       "保养",
       "价格"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "保养"
   },
   {
     "id": "FAQ-033",
@@ -818,7 +850,8 @@
       "质保",
       "三电"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "三电质保"
   },
   {
     "id": "FAQ-034",
@@ -842,7 +875,8 @@
       "质保",
       "整车"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "三电质保"
   },
   {
     "id": "FAQ-035",
@@ -867,7 +901,8 @@
       "衰减",
       "质保"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "三电质保"
   },
   {
     "id": "FAQ-036",
@@ -891,7 +926,8 @@
       "充电故障",
       "慢充"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "充电"
   },
   {
     "id": "FAQ-037",
@@ -915,7 +951,8 @@
       "充电故障",
       "快充"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "充电"
   },
   {
     "id": "FAQ-038",
@@ -942,7 +979,8 @@
       "充电桩",
       "故障"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "充电"
   },
   {
     "id": "FAQ-039",
@@ -966,7 +1004,8 @@
       "空调",
       "故障"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "空调"
   },
   {
     "id": "FAQ-040",
@@ -990,7 +1029,8 @@
       "车机",
       "故障"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "车机"
   },
   {
     "id": "FAQ-041",
@@ -1014,7 +1054,8 @@
       "OTA",
       "故障"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "车机"
   },
   {
     "id": "FAQ-042",
@@ -1040,7 +1081,8 @@
       "轮胎",
       "更换"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "轮胎"
   },
   {
     "id": "FAQ-043",
@@ -1064,7 +1106,8 @@
       "刹车",
       "异响"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "制动"
   },
   {
     "id": "FAQ-044",
@@ -1088,7 +1131,8 @@
       "事故",
       "维修"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "事故保险"
   },
   {
     "id": "FAQ-045",
@@ -1112,7 +1156,8 @@
       "保险",
       "理赔"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "事故保险"
   },
   {
     "id": "FAQ-046",
@@ -1136,7 +1181,8 @@
       "救援",
       "拖车"
     ],
-    "priority": "P0"
+    "priority": "P0",
+    "phenomenon": "救援"
   },
   {
     "id": "FAQ-047",
@@ -1160,7 +1206,8 @@
       "代步车",
       "服务"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "服务流程"
   },
   {
     "id": "FAQ-048",
@@ -1184,7 +1231,8 @@
       "预约",
       "维保"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "服务流程"
   },
   {
     "id": "FAQ-049",
@@ -1208,7 +1256,8 @@
       "工期",
       "维修"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "服务流程"
   },
   {
     "id": "FAQ-050",
@@ -1232,7 +1281,8 @@
       "配件",
       "原厂"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "配件价格"
   },
   {
     "id": "FAQ-051",
@@ -1256,7 +1306,8 @@
       "工时费",
       "价格"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "配件价格"
   },
   {
     "id": "FAQ-052",
@@ -1280,7 +1331,8 @@
       "质保",
       "易损件"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "三电质保"
   },
   {
     "id": "FAQ-053",
@@ -1305,7 +1357,8 @@
       "续航",
       "电池"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "续航"
   },
   {
     "id": "FAQ-054",
@@ -1329,7 +1382,8 @@
       "电池",
       "预热"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "续航"
   },
   {
     "id": "FAQ-055",
@@ -1353,7 +1407,8 @@
       "小电瓶",
       "救援"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": "救援"
   },
   {
     "id": "FAQ-056",
@@ -1377,7 +1432,8 @@
       "充电桩",
       "移机"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "充电"
   },
   {
     "id": "FAQ-057",
@@ -1401,7 +1457,8 @@
       "年检",
       "用车"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "用车"
   },
   {
     "id": "FAQ-058",
@@ -1425,7 +1482,8 @@
       "提醒",
       "App"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "用车"
   },
   {
     "id": "FAQ-059",
@@ -1449,7 +1507,8 @@
       "长途",
       "检查"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "用车"
   },
   {
     "id": "FAQ-060",
@@ -1476,7 +1535,8 @@
       "故障码",
       "警示灯"
     ],
-    "priority": "P0"
+    "priority": "P0",
+    "phenomenon": "故障诊断"
   },
   {
     "id": "FAQ-061",
@@ -1500,7 +1560,8 @@
       "投诉",
       "高风险"
     ],
-    "priority": "P0"
+    "priority": "P0",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-062",
@@ -1524,7 +1585,8 @@
       "退订",
       "高风险"
     ],
-    "priority": "P0"
+    "priority": "P0",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-063",
@@ -1548,7 +1610,8 @@
       "追问",
       "信息不足"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-064",
@@ -1572,7 +1635,8 @@
       "无法判断",
       "转人工"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-065",
@@ -1596,7 +1660,8 @@
       "价格",
       "高风险"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-066",
@@ -1620,7 +1685,8 @@
       "竞品",
       "话术"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-067",
@@ -1644,7 +1710,8 @@
       "返修",
       "纠纷"
     ],
-    "priority": "P1"
+    "priority": "P1",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-068",
@@ -1668,7 +1735,8 @@
       "隐私",
       "合规"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": ""
   },
   {
     "id": "FAQ-069",
@@ -1693,6 +1761,7 @@
       "滤芯",
       "保养"
     ],
-    "priority": "P2"
+    "priority": "P2",
+    "phenomenon": "空调"
   }
 ]

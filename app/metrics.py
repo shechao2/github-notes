@@ -13,6 +13,45 @@ def _window(days: int) -> str:
     return (datetime.now().astimezone() - timedelta(days=days)).isoformat(timespec="seconds")
 
 
+def bad_cases(conn: sqlite3.Connection, days: int = 30, limit: int = 20) -> list[dict[str, Any]]:
+    """Bad Case 清单：知识未命中、客服驳回、客户反馈错误/未解决，合并成一张可追踪的表。"""
+    rows = conn.execute(
+        """SELECT m.id, m.status, m.feedback, m.created_at, m.text AS ai_answer,
+                  json_extract(m.decision, '$.text') AS question,
+                  t.no AS ticket_no, t.owner, t.status AS ticket_status
+           FROM messages m LEFT JOIN tickets t ON t.message_id = m.id
+           WHERE m.role = 'ai' AND m.created_at >= ?
+             AND (m.status IN ('no_hit', 'rejected') OR m.feedback IN ('wrong', 'unsolved'))
+           ORDER BY m.created_at DESC LIMIT ?""",
+        (_window(days), limit),
+    ).fetchall()
+
+    result = []
+    for row in rows:
+        reasons = []
+        if row["status"] == "no_hit":
+            reasons.append("知识未命中")
+        if row["status"] == "rejected":
+            reasons.append("客服驳回 AI 答案")
+        if row["feedback"] == "wrong":
+            reasons.append("客户反馈答案错误")
+        if row["feedback"] == "unsolved":
+            reasons.append("客户反馈未解决")
+        result.append(
+            {
+                "message_id": row["id"],
+                "question": row["question"] or "",
+                "ai_answer": row["ai_answer"],
+                "reasons": reasons,
+                "ticket_no": row["ticket_no"],
+                "owner": row["owner"] or "",
+                "ticket_status": row["ticket_status"] or "",
+                "created_at": row["created_at"],
+            }
+        )
+    return result
+
+
 def dashboard(conn: sqlite3.Connection, days: int = 30) -> dict[str, Any]:
     since = _window(days)
     q = lambda sql, args=(): conn.execute(sql, args).fetchone()[0]  # noqa: E731
@@ -105,6 +144,15 @@ def dashboard(conn: sqlite3.Connection, days: int = 30) -> dict[str, Any]:
     faq_pending = q("SELECT COUNT(*) FROM faq WHERE status = '待审核'")
     faq_total = q("SELECT COUNT(*) FROM faq WHERE status = '生效'")
 
+    fault_phenomena = [
+        {"phenomenon": row["phenomenon"], "faq_count": row["c"], "hits": row["h"] or 0}
+        for row in conn.execute(
+            """SELECT phenomenon, COUNT(*) c, SUM(hits) h FROM faq
+               WHERE phenomenon != '' GROUP BY phenomenon ORDER BY h DESC, c DESC"""
+        ).fetchall()
+    ]
+    cases = bad_cases(conn, days=days, limit=10)
+
     overdue_first = sum(1 for t in ticket_list if t["sla"]["first_response"]["overdue"])
     overdue_resolve = sum(1 for t in ticket_list if t["sla"]["resolve"]["overdue"])
 
@@ -136,6 +184,9 @@ def dashboard(conn: sqlite3.Connection, days: int = 30) -> dict[str, Any]:
         "top_faq": top_faq,
         "unmatched_questions": unmatched,
         "repeat_handoff": handoff_by_intent,
+        "fault_phenomena": fault_phenomena,
+        "bad_cases": cases,
+        "bad_case_count": len(cases),
         "faq": {"total": faq_total, "new": faq_new, "updated": faq_updated, "pending_review": faq_pending},
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "thresholds": {

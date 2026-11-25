@@ -41,6 +41,25 @@ FIELD_SPEC: list[dict[str, Any]] = [
 # 车型起步价（万元），用于「售价」字段；未提及车型则留空
 MODEL_PRICE: dict[str, float] = {"X3": 13.98, "S7": 19.98, "L9": 28.98}
 
+TICKET_FIELD_SPEC: list[dict[str, Any]] = [
+    {"field_name": "工单编号", "type": 1},
+    {"field_name": "用户原始问题", "type": 1},
+    {"field_name": "识别意图", "type": 1},
+    {"field_name": "车型与场景", "type": 1},
+    {"field_name": "AI召回条目", "type": 1},
+    {"field_name": "AI回答", "type": 1},
+    {"field_name": "转人工原因", "type": 1},
+    {"field_name": "优先级", "type": 3, "property": {"options": [{"name": "P0"}, {"name": "P1"}, {"name": "P2"}]}},
+    {"field_name": "负责人", "type": 1},
+    {"field_name": "处理状态", "type": 3, "property": {"options": [{"name": "待处理"}, {"name": "处理中"}, {"name": "已解决"}, {"name": "已关闭"}]}},
+    {"field_name": "首次响应时间", "type": 5},
+    {"field_name": "解决时间", "type": 5},
+    {"field_name": "根因分类", "type": 1},
+    {"field_name": "最终解决方案", "type": 1},
+    {"field_name": "用户满意度", "type": 2},
+    {"field_name": "是否建议新增FAQ", "type": 7},
+]
+
 _token_cache: dict[str, Any] = {"token": "", "expire_at": 0.0}
 
 
@@ -200,26 +219,83 @@ def sync_session(session: dict[str, Any], app_token: str | None = None, table_id
     return {"app_token": app_token, "table_id": table_id, "record_id": record_id, "fields": fields}
 
 
+def ticket_fields(ticket: dict[str, Any]) -> dict[str, Any]:
+    """工单 -> 飞书工单表 16 个字段（纯函数）。"""
+    return {
+        "工单编号": ticket.get("no", ""),
+        "用户原始问题": ticket.get("question", ""),
+        "识别意图": ticket.get("intent", ""),
+        "车型与场景": " / ".join(x for x in (ticket.get("model", ""), ticket.get("scene", "")) if x),
+        "AI召回条目": "、".join(ticket.get("faq_ids") or []),
+        "AI回答": (ticket.get("ai_answer") or "")[:400],
+        "转人工原因": ticket.get("handoff_reason", ""),
+        "优先级": ticket.get("priority", "P2"),
+        "负责人": ticket.get("owner", "未分配"),
+        "处理状态": ticket.get("status", "待处理"),
+        "首次响应时间": _ms(ticket.get("first_response_at")),
+        "解决时间": _ms(ticket.get("resolved_at")),
+        "根因分类": ticket.get("root_cause", ""),
+        "最终解决方案": ticket.get("solution", ""),
+        "用户满意度": ticket.get("satisfaction"),
+        "是否建议新增FAQ": bool(ticket.get("suggest_faq")),
+    }
+
+
+def create_ticket_table(app_token: str, table_name: str = "工单记录") -> str:
+    data = _request(
+        "POST",
+        f"/bitable/v1/apps/{app_token}/tables",
+        {"table": {"name": table_name, "default_view_name": "全部工单", "fields": TICKET_FIELD_SPEC}},
+    )
+    return data["table_id"]
+
+
+def sync_ticket(ticket: dict[str, Any], app_token: str | None = None, table_id: str | None = None) -> dict[str, Any]:
+    app_token = app_token or config.FEISHU_BITABLE_TOKEN
+    table_id = table_id or config.FEISHU_TICKET_TABLE_ID
+    if not (app_token and table_id):
+        raise FeishuError(-2, "工单表未初始化，先执行 python -m app.feishu init-tickets")
+    fields = ticket_fields(ticket)
+    record_id = upsert_record(app_token, table_id, fields["工单编号"], fields)
+    return {"table_id": table_id, "record_id": record_id, "fields": fields}
+
+
+def init_ticket_table() -> dict[str, Any]:
+    app_token = config.FEISHU_BITABLE_TOKEN
+    if not app_token:
+        raise FeishuError(-3, "还没有多维表格，先执行 python -m app.feishu init")
+    table_id = create_ticket_table(app_token)
+    _persist(app_token, config.FEISHU_TABLE_ID, table_id)
+    return {"app_token": app_token, "ticket_table_id": table_id,
+            "url": f"https://my.feishu.cn/base/{app_token}"}
+
+
 def init_base(name: str = "星驰客户资产池") -> dict[str, Any]:
     base = create_base(name)
     table_id = create_table(base["app_token"])
-    _persist(base["app_token"], table_id)
-    return {**base, "table_id": table_id}
+    ticket_table_id = create_ticket_table(base["app_token"])
+    _persist(base["app_token"], table_id, ticket_table_id)
+    return {**base, "table_id": table_id, "ticket_table_id": ticket_table_id}
 
 
-def _persist(app_token: str, table_id: str) -> None:
+def _persist(app_token: str, table_id: str, ticket_table_id: str | None = None) -> None:
     """把 app_token / table_id 写回 .env，避免每次重新建表。"""
     env_path = os.path.join(config.BASE_DIR, ".env")
     lines: list[str] = []
     if os.path.exists(env_path):
         with open(env_path, encoding="utf-8") as fh:
             lines = [line for line in fh.read().splitlines()
-                     if not line.startswith(("FEISHU_BITABLE_TOKEN", "FEISHU_TABLE_ID"))]
+                     if not line.startswith(("FEISHU_BITABLE_TOKEN", "FEISHU_TABLE_ID",
+                                             "FEISHU_TICKET_TABLE_ID"))]
     lines += [f"FEISHU_BITABLE_TOKEN={app_token}", f"FEISHU_TABLE_ID={table_id}"]
+    if ticket_table_id:
+        lines.append(f"FEISHU_TICKET_TABLE_ID={ticket_table_id}")
     with open(env_path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
     config.FEISHU_BITABLE_TOKEN = app_token
     config.FEISHU_TABLE_ID = table_id
+    if ticket_table_id:
+        config.FEISHU_TICKET_TABLE_ID = ticket_table_id
 
 
 def _main(argv: list[str]) -> int:
@@ -228,6 +304,9 @@ def _main(argv: list[str]) -> int:
     action = argv[1] if len(argv) > 1 else "init"
     if action == "init":
         print(json.dumps(init_base(), ensure_ascii=False, indent=2))
+        return 0
+    if action == "init-tickets":
+        print(json.dumps(init_ticket_table(), ensure_ascii=False, indent=2))
         return 0
     if action == "sync":
         conn = db.connect(config.DB_PATH)
@@ -239,7 +318,14 @@ def _main(argv: list[str]) -> int:
             session = get_session(conn, row["id"])
             sync_session(session)
             ok += 1
-        print(json.dumps({"synced": ok}, ensure_ascii=False))
+        from .tickets import get_ticket
+
+        tickets_ok = 0
+        if config.FEISHU_TICKET_TABLE_ID:
+            for row in conn.execute("SELECT id FROM tickets ORDER BY created_at").fetchall():
+                sync_ticket(get_ticket(conn, row["id"]))
+                tickets_ok += 1
+        print(json.dumps({"sessions": ok, "tickets": tickets_ok}, ensure_ascii=False))
         return 0
     print("用法：python -m app.feishu init | sync")
     return 1

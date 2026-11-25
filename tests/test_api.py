@@ -92,3 +92,24 @@ def test_demo_seed_endpoint(client):
     assert out["ok"] is True
     assert out["sessions"] == 14
     assert client.get("/api/sessions").json()["items"]
+
+
+def test_bad_cases_endpoint(client):
+    client.post("/api/chat", json={"text": "你们公司股票代码是多少"})
+    items = client.get("/api/bad-cases").json()["items"]
+    assert items
+    assert "知识未命中" in items[0]["reasons"]
+
+
+def test_faq_phenomenon_roundtrip(client):
+    created = client.post(
+        "/api/faq",
+        json={
+            "question": "慢充一直跳枪怎么排查",
+            "answer": "先换桩复测，仍跳枪到店读充电故障码。",
+            "category": "售后",
+            "phenomenon": "充电",
+            "status": "生效",
+        },
+    ).json()
+    assert created["phenomenon"] == "充电"

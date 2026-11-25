@@ -202,6 +202,7 @@ def upsert_entry(conn: sqlite3.Connection, entry: dict[str, Any]) -> dict[str, A
         "variants": dumps(entry.get("variants") or []),
         "models": dumps(entry.get("models") or [config.ALL_MODELS]),
         "scene": entry.get("scene", ""),
+        "phenomenon": entry.get("phenomenon", ""),
         "answer": entry["answer"],
         "source": entry.get("source", "人工录入"),
         "owner": entry.get("owner", "待指派"),
@@ -214,7 +215,8 @@ def upsert_entry(conn: sqlite3.Connection, entry: dict[str, Any]) -> dict[str, A
     if existing:
         conn.execute(
             """UPDATE faq SET category=:category, question=:question, variants=:variants,
-               models=:models, scene=:scene, answer=:answer, source=:source, owner=:owner,
+               models=:models, scene=:scene, phenomenon=:phenomenon, answer=:answer,
+               source=:source, owner=:owner,
                updated_at=:updated_at, status=:status, tags=:tags, priority=:priority
                WHERE id=:id""",
             payload,
@@ -222,9 +224,10 @@ def upsert_entry(conn: sqlite3.Connection, entry: dict[str, Any]) -> dict[str, A
     else:
         payload["created_at"] = entry.get("created_at") or now_iso()
         conn.execute(
-            """INSERT INTO faq(id, category, question, variants, models, scene, answer, source,
-               owner, updated_at, status, tags, priority, created_at)
-               VALUES(:id, :category, :question, :variants, :models, :scene, :answer, :source,
+            """INSERT INTO faq(id, category, question, variants, models, scene, phenomenon, answer,
+               source, owner, updated_at, status, tags, priority, created_at)
+               VALUES(:id, :category, :question, :variants, :models, :scene, :phenomenon, :answer,
+               :source,
                :owner, :updated_at, :status, :tags, :priority, :created_at)""",
             payload,
         )

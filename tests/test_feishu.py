@@ -107,3 +107,40 @@ def test_missing_credentials_raise(monkeypatch):
     feishu._token_cache.update({"token": "", "expire_at": 0})
     with pytest.raises(feishu.FeishuError):
         feishu.tenant_token()
+
+
+def test_ticket_field_spec():
+    names = [f["field_name"] for f in feishu.TICKET_FIELD_SPEC]
+    assert len(names) == 16
+    for expected in ("工单编号", "转人工原因", "根因分类", "最终解决方案", "用户满意度", "是否建议新增FAQ"):
+        assert expected in names
+
+
+def test_ticket_fields_mapping():
+    ticket = {
+        "no": "T-20261126-001",
+        "question": "我要投诉门店服务态度",
+        "intent": "投诉",
+        "model": "",
+        "scene": "边界",
+        "faq_ids": ["FAQ-061"],
+        "ai_answer": "需要人工跟进",
+        "handoff_reason": "意图「投诉」必须人工接管",
+        "priority": "P0",
+        "owner": "客户运营-赵倩",
+        "status": "已解决",
+        "first_response_at": "2026-11-26T03:35:00+08:00",
+        "resolved_at": "2026-11-26T04:05:00+08:00",
+        "root_cause": "门店接待态度",
+        "solution": "已致歉并回访",
+        "satisfaction": 4,
+        "suggest_faq": 1,
+    }
+    fields = feishu.ticket_fields(ticket)
+    assert fields["工单编号"] == "T-20261126-001"
+    assert fields["优先级"] == "P0"
+    assert fields["处理状态"] == "已解决"
+    assert fields["用户满意度"] == 4
+    assert fields["是否建议新增FAQ"] is True
+    assert isinstance(fields["解决时间"], int)
+    assert "边界" in fields["车型与场景"]

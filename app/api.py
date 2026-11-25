@@ -55,6 +55,7 @@ class FaqIn(BaseModel):
     variants: list[str] = Field(default_factory=list)
     models: list[str] = Field(default_factory=lambda: [config.ALL_MODELS])
     scene: str = ""
+    phenomenon: str = ""
     source: str = "人工录入"
     owner: str = "待指派"
     tags: list[str] = Field(default_factory=list)
@@ -70,6 +71,7 @@ class FaqPatch(BaseModel):
     variants: list[str] | None = None
     models: list[str] | None = None
     scene: str | None = None
+    phenomenon: str | None = None
     source: str | None = None
     owner: str | None = None
     tags: list[str] | None = None
@@ -221,6 +223,15 @@ def publish(faq_id: str, conn: sqlite3.Connection = Depends(get_conn)):
     return entry
 
 
+@router.get("/bad-cases")
+def bad_cases(
+    days: int = Query(30, ge=1, le=365),
+    limit: int = Query(20, ge=1, le=200),
+    conn: sqlite3.Connection = Depends(get_conn),
+):
+    return {"items": metrics.bad_cases(conn, days=days, limit=limit)}
+
+
 @router.get("/dashboard")
 def dashboard(days: int = Query(30, ge=1, le=365), conn: sqlite3.Connection = Depends(get_conn)):
     return metrics.dashboard(conn, days=days)
@@ -233,6 +244,7 @@ def feishu_status() -> dict[str, Any]:
     return {
         "configured": bool(config.FEISHU_APP_ID and config.FEISHU_APP_SECRET),
         "base_ready": bool(config.FEISHU_BITABLE_TOKEN and config.FEISHU_TABLE_ID),
+        "ticket_table_ready": bool(config.FEISHU_TICKET_TABLE_ID),
         "base_url": f"https://my.feishu.cn/base/{config.FEISHU_BITABLE_TOKEN}" if config.FEISHU_BITABLE_TOKEN else None,
         "fields": [field["field_name"] for field in feishu.FIELD_SPEC],
     }
@@ -255,7 +267,14 @@ def feishu_sync(session_id: str | None = None, conn: sqlite3.Connection = Depend
             if session:
                 feishu.sync_session(session)
                 synced += 1
-        return {"synced": synced}
+        synced_tickets = 0
+        if config.FEISHU_TICKET_TABLE_ID:
+            for row in conn.execute("SELECT id FROM tickets ORDER BY created_at").fetchall():
+                ticket = tickets.get_ticket(conn, row["id"])
+                if ticket:
+                    feishu.sync_ticket(ticket)
+                    synced_tickets += 1
+        return {"synced": synced, "synced_tickets": synced_tickets}
     except feishu.FeishuError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

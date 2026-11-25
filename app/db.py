@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS faq (
     variants    TEXT NOT NULL DEFAULT '[]',
     models      TEXT NOT NULL DEFAULT '[]',
     scene       TEXT NOT NULL DEFAULT '',
+    phenomenon  TEXT NOT NULL DEFAULT '',
     answer      TEXT NOT NULL,
     source      TEXT NOT NULL DEFAULT '',
     owner       TEXT NOT NULL DEFAULT '',
@@ -120,6 +121,9 @@ def connect(db_path: str) -> sqlite3.Connection:
 
 def init_db(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(faq)")}
+    if "phenomenon" not in columns:  # 老库平滑升级
+        conn.execute("ALTER TABLE faq ADD COLUMN phenomenon TEXT NOT NULL DEFAULT ''")
     conn.commit()
 
 

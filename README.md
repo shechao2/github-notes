@@ -52,8 +52,10 @@ python -m pytest -q              # 42 passed
 | 同义词、标签、答案来源 | `data/faq.json` 的 `variants/tags/source` 字段 | 搜「维保周期」能命中「保养周期」那条 |
 | 问题状态、负责人、优先级、SLA 节点 | `app/tickets.py`、`docs/sla.md` | 工单页看首响倒计时与超时标记 |
 | AI 未解决 → 人工接管 → 结果回写 | `app/service.py:review_message`、`app/tickets.py:create_faq_draft` | 转人工 → 填方案 → 生成 FAQ 草稿 → 发布 |
-| 看板：解决率、满意度、转人工率、高频问题 | `app/metrics.py` | 看板页 8 个 KPI + 4 张榜 |
-| Bad Case 复盘 | 看板「Top 10 未命中」「重复转人工」+ 工单根因 | 演示股票代码那条未命中问题 |
+| 看板：解决率、满意度、转人工率、高频问题 | `app/metrics.py` | 看板页 8 个 KPI + 6 张榜 |
+| 按**故障现象**分类 | `data/faq.json` 的 `phenomenon` 字段（14 类）+ 看板「故障现象分布」 | 看板底部按车型故障现象看命中 |
+| **Bad Case 清单** | `metrics.bad_cases` + `GET /api/bad-cases` | 看板「Bad Case 清单」含原因/工单/负责人 |
+| **FAQ 编写规范 / 工作流 SOP** | `docs/faq-spec.md`、`docs/sop.md` | 文档里逐条可查 |
 
 ## 五分钟演示路线
 
@@ -82,16 +84,22 @@ app/
 data/faq.json   69 条结构化 FAQ
 static/         单页工作台（原生 JS，无构建）
 tests/          42 个测试（检索、决策、工单、指标、接口）
-docs/           架构、SLA 规则、演示脚本、展示指南（pitch.md）
+docs/           架构、SLA 规则、演示脚本、展示指南、FAQ 规范（faq-spec.md）、SOP（sop.md）
 ```
 
 ## 飞书多维表格（已打通）
 
-演示表格：**https://my.feishu.cn/base/NNwtbi7R7a5BBlsFWCjc1WaN6ke**（16 个字段，14 条会话已写入）
+演示表格：**https://my.feishu.cn/base/NNwtbi7R7a5BBlsFWCjc1WaN6ke**（一个多维表格，两张数据表）
+
+| 数据表 | 字段 | 记录 | 内容 |
+|---|---|---|---|
+| 客户会话记录 | 16 | 14 | 会话画像、意图、情绪、问题状态、负责人、优先级、SLA 节点 |
+| 工单记录 | 16 | 5 | 原始问题、AI 召回条目、转人工原因、根因、最终方案、满意度、是否建议新增 FAQ |
 
 ```bash
-python -m app.feishu init     # 建表 + 16 字段（app_token / table_id 自动写回 .env）
-python -m app.feishu sync     # 按「会话ID」去重，把本地会话全量同步
+python -m app.feishu init            # 新建多维表格 + 两张表（token 自动写回 .env）
+python -m app.feishu init-tickets    # 已有表格时，只补「工单记录」表
+python -m app.feishu sync            # 会话 + 工单一起同步（按 ID 去重）
 ```
 
 - 工作台右上角有「同步到飞书」按钮，单个会话一键写入；
@@ -111,6 +119,8 @@ python -m app.feishu sync     # 按「会话ID」去重，把本地会话全量�
 | 平均首响 | 首次响应时间 − 工单创建时间，取均值 |
 | Top 10 高频问题 | 用户消息按意图聚合（同义说法归到同一意图） |
 | Top 10 未命中 | `status = no_hit` 的问题按出现次数排序 |
+| 故障现象分布 | 售后 FAQ 按 `phenomenon` 分组，看命中数（车机 / 保养 / 充电 / 空调 / 制动 …） |
+| Bad Case 清单 | 未命中 + 客服驳回 + 客户反馈错误/未解决，合并成可追踪清单（含原因、工单号、负责人、处理状态） |
 | 重复转人工 | 同一意图建单数 ≥ 2 |
 | FAQ 新增/更新 | 近 30 天 `created_at` / `updated_at` 计数 |
 

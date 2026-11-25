@@ -166,6 +166,7 @@ def create_faq_draft(conn: sqlite3.Connection, ticket_id: str) -> dict[str, Any]
         "variants": [],
         "models": [m for m in (ticket.get("model") or "").split(",") if m] or [config.ALL_MODELS],
         "scene": ticket.get("scene", "工单回写"),
+        "phenomenon": "工单回写",
         "answer": ticket["solution"],
         "source": f"工单回写 {ticket['no']}",
         "owner": ticket.get("owner") or "待指派",
