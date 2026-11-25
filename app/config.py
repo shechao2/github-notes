@@ -76,3 +76,9 @@ LLM_ENABLED = os.environ.get("A4S_LLM", "0") == "1"
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 LLM_MODEL = os.environ.get("A4S_LLM_MODEL", "deepseek-chat")
+
+# 飞书自建应用与多维表格（M2）：凭证只放 .env
+FEISHU_APP_ID = os.environ.get("FEISHU_APP_ID", "")
+FEISHU_APP_SECRET = os.environ.get("FEISHU_APP_SECRET", "")
+FEISHU_BITABLE_TOKEN = os.environ.get("FEISHU_BITABLE_TOKEN", "")
+FEISHU_TABLE_ID = os.environ.get("FEISHU_TABLE_ID", "")

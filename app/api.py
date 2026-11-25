@@ -226,6 +226,39 @@ def dashboard(days: int = Query(30, ge=1, le=365), conn: sqlite3.Connection = De
     return metrics.dashboard(conn, days=days)
 
 
+@router.get("/feishu/status")
+def feishu_status() -> dict[str, Any]:
+    from . import feishu
+
+    return {
+        "configured": bool(config.FEISHU_APP_ID and config.FEISHU_APP_SECRET),
+        "base_ready": bool(config.FEISHU_BITABLE_TOKEN and config.FEISHU_TABLE_ID),
+        "fields": [field["field_name"] for field in feishu.FIELD_SPEC],
+    }
+
+
+@router.post("/feishu/sync")
+def feishu_sync(session_id: str | None = None, conn: sqlite3.Connection = Depends(get_conn)):
+    from . import feishu
+
+    try:
+        if session_id:
+            session = service.get_session(conn, session_id)
+            if not session:
+                raise HTTPException(status_code=404, detail="会话不存在")
+            return feishu.sync_session(session)
+        rows = conn.execute("SELECT id FROM sessions ORDER BY updated_at DESC").fetchall()
+        synced = 0
+        for row in rows:
+            session = service.get_session(conn, row["id"])
+            if session:
+                feishu.sync_session(session)
+                synced += 1
+        return {"synced": synced}
+    except feishu.FeishuError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @router.post("/demo/seed")
 def demo_seed(reset: bool = False, conn: sqlite3.Connection = Depends(get_conn)):
     from . import seed as seed_module
