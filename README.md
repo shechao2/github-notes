@@ -63,7 +63,7 @@ python -m pytest -q              # 42 passed
 4. **工单**：打开投诉单，看 P0 首响 15 分钟倒计时（演示数据里有一单已超时）；改状态为已解决、填根因和方案。
 5. **回写**：点「生成 FAQ 草稿」→ 知识库出现一条待审核 → 发布 → 再搜同样问题就命中了。
 
-详细话术见 `docs/demo-script.md`。
+详细话术见 `docs/demo-script.md`，简历写法与面试追问见 `docs/pitch.md`。
 
 ## 目录结构
 
@@ -82,7 +82,7 @@ app/
 data/faq.json   69 条结构化 FAQ
 static/         单页工作台（原生 JS，无构建）
 tests/          42 个测试（检索、决策、工单、指标、接口）
-docs/           架构、SLA 规则、演示脚本
+docs/           架构、SLA 规则、演示脚本、展示指南（pitch.md）
 ```
 
 ## 飞书多维表格（已打通）
