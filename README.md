@@ -126,6 +126,10 @@ DEEPSEEK_API_KEY=sk-xxxx
 python -m app.llm "S7 续航多少"
 ```
 
+实测（`deepseek-flash`，单次约 370—420 token，数字全部落在证据内）：
+
+![大模型改写实测](docs/screenshots/llm-rewrite.png)
+
 ## 兜底规则（写死在代码里，不靠模型自觉）
 
 1. **没检索结果就不生成答案**，直接转人工，不猜。
