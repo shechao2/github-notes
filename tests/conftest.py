@@ -4,6 +4,9 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault("A4S_DB", os.path.join(tempfile.gettempdir(), "a4s_pytest_default.db"))
+# 测试必须离线、可重复：即使本地 .env 开了大模型也强制关掉
+os.environ["A4S_LLM"] = "0"
+os.environ["DEEPSEEK_API_KEY"] = ""
 
 import pytest
 
