@@ -38,6 +38,7 @@ def test_session_fields_mapping():
     assert fields["问题状态"] == "已解决"
     assert fields["负责人"] == "售后-李工"
     assert fields["优先级"] == "P1"
+    assert fields["售价"] == 19.98
     assert isinstance(fields["时间"], int) and fields["时间"] > 0
     assert isinstance(fields["SLA节点"], int)
 
@@ -45,9 +46,24 @@ def test_session_fields_mapping():
 def test_session_without_ticket_defaults():
     session = {"id": "s2", "customer": "访客", "messages": [], "tickets": []}
     fields = feishu.session_fields(session)
-    assert fields["问题状态"] == "已解决"
+    assert fields["问题状态"] == "待处理"
     assert fields["负责人"] == "未分配"
     assert fields["标签"] == ["未提及车型"]
+    assert fields["售价"] is None
+
+
+def test_models_union_across_messages():
+    session = {
+        "id": "s3", "customer": "韩女士", "messages": [
+            {"role": "ai", "status": "accepted", "decision": {"models": ["L9"], "intent": "车型配置", "scene": "售前"}},
+            {"role": "ai", "status": "accepted", "decision": {"models": [], "intent": "补能充电", "scene": "售前"}},
+        ], "tickets": [],
+    }
+    fields = feishu.session_fields(session)
+    assert fields["标签"] == ["L9"]
+    assert fields["售价"] == 28.98
+    assert fields["问题状态"] == "已解决"
+    assert fields["负责人"] == "AI 自动"
 
 
 def test_upsert_updates_existing_record(monkeypatch):

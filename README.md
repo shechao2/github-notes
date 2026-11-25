@@ -83,6 +83,21 @@ tests/          42 个测试（检索、决策、工单、指标、接口）
 docs/           架构、SLA 规则、演示脚本
 ```
 
+## 飞书多维表格（已打通）
+
+演示表格：**https://my.feishu.cn/base/NNwtbi7R7a5BBlsFWCjc1WaN6ke**（16 个字段，14 条会话已写入）
+
+```bash
+python -m app.feishu init     # 建表 + 16 字段（app_token / table_id 自动写回 .env）
+python -m app.feishu sync     # 按「会话ID」去重，把本地会话全量同步
+```
+
+- 工作台右上角有「同步到飞书」按钮，单个会话一键写入；
+- 接口：`GET /api/feishu/status`（是否配置、表地址、字段列表）、`POST /api/feishu/sync?session_id=...`；
+- 字段映射：会话ID / 客户昵称 / 性别 / 平台 / 客层 / 咨询意图 / 情绪状态 / 转化状态 / 标签 / 询问商品 / 售价 / 时间 / 问题状态 / 负责人 / 优先级 / SLA节点；
+- 凭证只放 `.env`（`FEISHU_APP_ID` / `FEISHU_APP_SECRET`），已被 `.gitignore` 忽略；
+- 应用需要开通 **`bitable:app`** 并**发布版本**，否则写入会报 `99991672`。
+
 ## 指标口径（面试会被追问，先说清楚）
 
 | 指标 | 公式 |
@@ -109,7 +124,7 @@ docs/           架构、SLA 规则、演示脚本
 
 - 答案由「检索 + 结构化拼接」生成，未接大模型；`A4S_LLM=1` 与 `DEEPSEEK_API_KEY` 已预留接口位置。
 - 检索是 FTS5 关键词 + 覆盖度打分，没有向量检索；FAQ 超过几千条时需要上 pgvector/FAISS。
-- 工单目前存 SQLite；飞书多维表格写入是 M2 内容（字段表见 `docs/sla.md` 附录）。
+- 工单主存储在 SQLite；飞书多维表格为同步副本（单向写入，暂不回读飞书侧修改）。
 - 单机演示，无鉴权；上线需加登录、审计和限流。
 
 ## 演示数据说明

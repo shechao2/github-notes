@@ -233,6 +233,7 @@ def feishu_status() -> dict[str, Any]:
     return {
         "configured": bool(config.FEISHU_APP_ID and config.FEISHU_APP_SECRET),
         "base_ready": bool(config.FEISHU_BITABLE_TOKEN and config.FEISHU_TABLE_ID),
+        "base_url": f"https://my.feishu.cn/base/{config.FEISHU_BITABLE_TOKEN}" if config.FEISHU_BITABLE_TOKEN else None,
         "fields": [field["field_name"] for field in feishu.FIELD_SPEC],
     }
 

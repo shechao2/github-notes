@@ -38,6 +38,9 @@ FIELD_SPEC: list[dict[str, Any]] = [
     {"field_name": "SLA节点", "type": 5},
 ]
 
+# 车型起步价（万元），用于「售价」字段；未提及车型则留空
+MODEL_PRICE: dict[str, float] = {"X3": 13.98, "S7": 19.98, "L9": 28.98}
+
 _token_cache: dict[str, Any] = {"token": "", "expire_at": 0.0}
 
 
@@ -138,20 +141,33 @@ def _ms(value: str | None) -> int | None:
 def session_fields(session: dict[str, Any], ticket: dict[str, Any] | None = None) -> dict[str, Any]:
     """把本地会话映射成 16 个飞书字段（纯函数，方便测试）。"""
     messages = session.get("messages", [])
-    last_ai = next((m for m in reversed(messages) if m.get("role") == "ai"), {})
+    ai_messages = [m for m in messages if m.get("role") == "ai"]
+    last_ai = ai_messages[-1] if ai_messages else {}
     last_user = next((m for m in reversed(messages) if m.get("role") == "user"), {})
     decision = last_ai.get("decision") or {}
     ticket = ticket or (session.get("tickets") or [None])[0]
 
+    # 车型取整段会话的并集，避免「最后一句没提车型」导致画像丢失
+    models: list[str] = []
+    for message in ai_messages:
+        for model in (message.get("decision") or {}).get("models", []) or []:
+            if model not in models:
+                models.append(model)
+
     intent = decision.get("intent") or last_ai.get("intent") or "其他"
-    status = "已解决" if (ticket or {}).get("status") == "已解决" else (
-        "跟进中" if (ticket or {}).get("status") == "处理中" else ("待处理" if ticket else "已解决")
-    )
+    if ticket:
+        status = {"已解决": "已解决", "处理中": "跟进中", "已关闭": "已关闭"}.get(ticket.get("status"), "待处理")
+    elif last_ai.get("status") in {"accepted", "edited"}:
+        status = "已解决"
+    else:
+        status = "待处理"
+
     conversion = "售后处理" if decision.get("scene") == "售后" else (
         "明确意向" if intent in {"价格咨询", "金融方案", "试驾", "交付", "置换"} else "待跟进"
     )
-    models = decision.get("models") or []
     sla_due = (ticket or {}).get("sla_resolve_due") or (ticket or {}).get("sla_first_due")
+    owner = (ticket or {}).get("owner") or ("AI 自动" if status == "已解决" else "未分配")
+    price = MODEL_PRICE.get(models[0]) if models else None
 
     return {
         "会话ID": session.get("id", ""),
@@ -162,12 +178,12 @@ def session_fields(session: dict[str, Any], ticket: dict[str, Any] | None = None
         "咨询意图": intent,
         "情绪状态": decision.get("emotion") or "待确认",
         "转化状态": conversion,
-        "标签": [t for t in models if t] or ["未提及车型"],
-        "询问商品": "、".join(models) if models else "",
-        "售价": 0,
+        "标签": models or ["未提及车型"],
+        "询问商品": "、".join(models),
+        "售价": price,
         "时间": _ms(last_user.get("created_at")),
         "问题状态": status,
-        "负责人": (ticket or {}).get("owner") or "未分配",
+        "负责人": owner,
         "优先级": (ticket or {}).get("priority") or decision.get("priority") or "P2",
         "SLA节点": _ms(sla_due),
     }

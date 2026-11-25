@@ -518,7 +518,31 @@ $("#seedBtn").addEventListener("click", async () => {
   renderDecision();
 });
 
+async function loadFeishuStatus() {
+  try {
+    const status = await api("/api/feishu/status");
+    state.feishu = status;
+    const btn = $("#syncFeishu");
+    if (status.configured && status.base_ready) {
+      btn.style.display = "";
+      btn.title = "写入多维表格：" + (status.base_url || "");
+    }
+  } catch (_) { /* 未配置飞书时静默 */ }
+}
+
+$("#syncFeishu").addEventListener("click", async () => {
+  if (!state.session) return toast("先选一个会话", true);
+  const btn = $("#syncFeishu");
+  btn.disabled = true;
+  try {
+    const out = await api(`/api/feishu/sync?session_id=${state.session.id}`, { method: "POST" });
+    toast(`已同步到多维表格（record ${out.record_id}）`);
+  } catch (_) { /* toast 已提示 */ }
+  btn.disabled = false;
+});
+
 async function init() {
+  await loadFeishuStatus();
   try {
     const conf = await api("/api/config");
     $("#thresholdChip").textContent = `置信度阈值 ${(conf.confidence_threshold * 100).toFixed(0)}% · 追问线 ${(conf.clarify_threshold * 100).toFixed(0)}%`;
